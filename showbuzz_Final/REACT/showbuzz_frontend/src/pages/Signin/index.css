@@ -1,0 +1,21 @@
+h1.title {
+  text-align: center;
+}
+* {
+  box-sizing: border-box;
+}
+
+.row {
+  border: 5px black;
+}
+
+/* body {
+  background-color: #242333;
+  display: flexbox;
+  flex-direction: row;
+  color: white;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  font-family: "Lato", "sans-serif";
+} */

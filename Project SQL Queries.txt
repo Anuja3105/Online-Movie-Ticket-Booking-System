@@ -1,0 +1,1082 @@
+Enter password: ***********
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 8
+Server version: 8.0.32 MySQL Community Server - GPL
+
+Copyright (c) 2000, 2023, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> show database;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'database' at line 1
+
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| anka               |
+| cdac               |
+| information_schema |
+| mysql              |
+| performance_schema |
+| sakila             |
+| sys                |
+| world              |
++--------------------+
+8 rows in set (0.00 sec)
+
+mysql> create database showbuzz;
+Query OK, 1 row affected (0.01 sec)
+
+mysql> use showbuzz;
+Database changed
+mysql>
+mysql> create table User(
+    ->     user_id integer primary key auto_increment,
+    ->     first_name VARCHAR(100),
+    ->     last_name VARCHAR(100),
+    ->     email VARCHAR(100),
+    ->     phone_no VARCHAR(100),
+    ->     password VARCHAR(100),
+    ->     address_line VARCHAR(500),
+    ->     city varchar(100),
+    ->     state varchar(100),
+    ->     country varchar(100),
+    ->     pincode integer,
+    ->     role varchar(50),
+    ->     gender varchar(20),
+    ->     unique(email)
+    -> );
+Query OK, 0 rows affected (0.04 sec)
+
+mysql>
+mysql> create table Movie(
+    ->     movie_id integer primary key auto_increment,
+    ->     movie_name VARCHAR(100),
+    ->     movie_details VARCHAR(200),
+    ->     category VARCHAR(100),
+    ->     language VARCHAR(100),
+    ->     release_date date,
+    ->     status integer,
+    ->     movie_poster varchar(200),
+    ->     genre varchar(200)
+    -> );
+Query OK, 0 rows affected (0.02 sec)
+
+mysql>
+mysql>
+mysql> create table Movie_Rating(
+    ->     movie_rating_id integer primary key auto_increment,
+    ->     movie_id integer,
+    ->     user_id integer,
+    ->     rating float,
+    ->     foreign key (movie_id) references Movie(movie_id),
+    ->     foreign key (user_id) references User(user_id)
+    -> );
+Query OK, 0 rows affected (0.04 sec)
+
+mysql>
+mysql> create table Movie_Review(
+    ->     movie_reveiw_id integer primary key auto_increment,
+    ->     movie_id integer,
+    ->     user_id integer,
+    ->     review VARCHAR(1024),
+    ->     foreign key (movie_id) references Movie(movie_id),
+    ->     foreign key (user_id) references User(user_id)
+    -> );
+Query OK, 0 rows affected (0.03 sec)
+
+mysql>
+mysql>
+mysql> create table City(
+    ->     city_id integer primary key auto_increment,
+    ->     city_name VARCHAR(100),
+    ->     city_state VARCHAR(100),
+    ->     city_pincode integer
+    -> );
+Query OK, 0 rows affected (0.02 sec)
+
+mysql>
+mysql> create table Theatre(
+    ->     theatre_id integer primary key auto_increment,
+    ->     name VARCHAR(50),
+    ->     city_id integer,
+    ->     user_id integer,
+    ->     address VARCHAR(200),
+    ->     no_of_screen integer,
+    ->     key1 varchar(500), key2 varchar(500), foreign key(user_id) references User(user_id),
+    ->     foreign key (city_id) references City(city_id)
+    -> );
+Query OK, 0 rows affected (0.03 sec)
+
+mysql>
+mysql> create table Screen(
+    ->     screen_id integer primary key auto_increment,
+    ->     screen_no integer,
+    ->     theatre_id integer,
+    ->     foreign key (theatre_id) references Theatre(theatre_id)
+    -> );
+Query OK, 0 rows affected (0.02 sec)
+
+mysql>
+mysql> create table Shows(
+    ->     show_id int primary key auto_increment,
+    ->     movie_id int,
+    ->     screen_id int,
+    ->     cost_factor float,
+    ->     showdate date,
+    ->     showtime time,
+    ->     foreign key (movie_id) references Movie(movie_id),
+    ->     foreign key (screen_id) references Screen(screen_id)
+    -> );
+Query OK, 0 rows affected (0.03 sec)
+
+mysql>
+mysql>
+mysql>
+mysql>
+mysql> create table Seat(
+    ->     seat_id VARCHAR(5) primary key,
+    ->     seat_type VARCHAR(25),
+    ->     price float
+    -> );
+Query OK, 0 rows affected (0.02 sec)
+
+mysql>
+mysql> create table Seat_Booking(
+    ->     booking_id integer primary key auto_increment,
+    ->     show_id int,
+    ->     seat_id VARCHAR(5),
+    ->     user_id int,
+    ->     booking_date date,
+    ->     created_timestamp timestamp default CURRENT_TIMESTAMP,
+    ->     order_id VARCHAR(500),
+    ->     payment_status int,
+    ->     foreign key (show_id) references Shows(show_id),
+    ->     foreign key (user_id) references User(user_id),
+    ->     foreign key (seat_id) references Seat(seat_id)
+    -> );
+Query OK, 0 rows affected (0.04 sec)
+
+mysql>
+mysql>
+mysql>
+mysql> create table Payment(
+    ->     payment_id integer primary key auto_increment,
+    ->     razorpay_payment_id VARCHAR(500),
+    ->     order_id VARCHAR(500),
+    ->     signature VARCHAR(500),
+    ->     user_id int,
+    ->     totalAmount float,
+    ->     payment_timestamp  timestamp default CURRENT_TIMESTAMP,
+    ->     foreign key (user_id) references User(user_id)
+    -> );
+Query OK, 0 rows affected (0.03 sec)
+
+mysql>
+mysql>
+mysql> create table Orders(
+    ->     order_id integer primary key auto_increment,
+    ->     booking_id integer,
+    ->     user_id integer,
+    ->     payment_id integer,
+    ->     movie_id  integer,
+    ->     theatre_id integer,
+    ->     screen_id integer,
+    ->     show_id integer,
+    ->     seat_id VARCHAR(5),
+    ->     show_date date,
+    ->     show_time time,
+    ->     foreign key (user_id) references User(user_id),
+    ->     foreign key (payment_id) references Payment(payment_id),
+    ->     foreign key (movie_id) references Movie(movie_id),
+    ->     foreign key (theatre_id) references Theatre(theatre_id),
+    ->     foreign key (screen_id) references Screen(screen_id),
+    ->     foreign key (show_id) references Shows(show_id),
+    ->     foreign key (seat_id) references Seat(seat_id),
+    ->     foreign key (booking_id) references Seat_Booking(booking_id)
+    -> );
+Query OK, 0 rows affected (0.05 sec)
+
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| anka               |
+| cdac               |
+| information_schema |
+| mysql              |
+| performance_schema |
+| sakila             |
+| showbuzz           |
+| sys                |
+| world              |
++--------------------+
+9 rows in set (0.00 sec)
+
+mysql> use showbuzz
+Database changed
+mysql> show tables;
++--------------------+
+| Tables_in_showbuzz |
++--------------------+
+| city               |
+| movie              |
+| movie_rating       |
+| movie_review       |
+| orders             |
+| payment            |
+| screen             |
+| seat               |
+| seat_booking       |
+| shows              |
+| theatre            |
+| user               |
++--------------------+
+12 rows in set (0.04 sec)
+
+mysql> desc city;
++--------------+--------------+------+-----+---------+----------------+
+| Field        | Type         | Null | Key | Default | Extra          |
++--------------+--------------+------+-----+---------+----------------+
+| city_id      | int          | NO   | PRI | NULL    | auto_increment |
+| city_name    | varchar(100) | YES  |     | NULL    |                |
+| city_state   | varchar(100) | YES  |     | NULL    |                |
+| city_pincode | int          | YES  |     | NULL    |                |
++--------------+--------------+------+-----+---------+----------------+
+4 rows in set (0.03 sec)
+
+mysql> insert into city values(1,"Pune","Maharashtra",411001);
+Query OK, 1 row affected (0.04 sec)
+
+mysql> insert into city values(2,"Mumbai","Maharashtra",400001);
+Query OK, 1 row affected (0.03 sec)
+
+mysql> insert into city values(2,"Latur","Maharashtra",413512);
+ERROR 1062 (23000): Duplicate entry '2' for key 'city.PRIMARY'
+mysql> insert into city values(3,"Latur","Maharashtra",413512);
+Query OK, 1 row affected (0.03 sec)
+
+mysql> insert into city values(4,"Kolhapur","Maharashtra",416216);
+Query OK, 1 row affected (0.03 sec)
+
+mysql> insert into city values(5,"Sangli","Maharashtra",411211);)
+Query OK, 1 row affected (0.03 sec)
+
+    ->
+    -> ^C
+mysql> select * from city;
++---------+-----------+-------------+--------------+
+| city_id | city_name | city_state  | city_pincode |
++---------+-----------+-------------+--------------+
+|       1 | Pune      | Maharashtra |       411001 |
+|       2 | Mumbai    | Maharashtra |       400001 |
+|       3 | Latur     | Maharashtra |       413512 |
+|       4 | Kolhapur  | Maharashtra |       416216 |
+|       5 | Sangli    | Maharashtra |       411211 |
++---------+-----------+-------------+--------------+
+5 rows in set (0.00 sec)
+
+mysql> select * from user;
++---------+------------+-------------+-----------------+----------+--------------------------------------------------------------+--------------+------+-------+---------+---------+------+--------+
+| user_id | first_name | last_name   | email           | phone_no | password                                                     | address_line | city | state | country | pincode | role | gender |
++---------+------------+-------------+-----------------+----------+--------------------------------------------------------------+--------------+------+-------+---------+---------+------+--------+
+|       1 | anuja      | suryawanshi | anuja@gmail.com | NULL     | $2a$10$VL8rTfxRcqV2/PMnfH6pZumg95Ag6Fkg2TLbXhYJfDxxd2YnaKNlq | NULL         | NULL | NULL  | NULL    |       0 | user | NULL   |
++---------+------------+-------------+-----------------+----------+--------------------------------------------------------------+--------------+------+-------+---------+---------+------+--------+
+1 row in set (0.00 sec)
+
+mysql> desc movie;
++---------------+--------------+------+-----+---------+----------------+
+| Field         | Type         | Null | Key | Default | Extra          |
++---------------+--------------+------+-----+---------+----------------+
+| movie_id      | int          | NO   | PRI | NULL    | auto_increment |
+| movie_name    | varchar(100) | YES  |     | NULL    |                |
+| movie_details | varchar(200) | YES  |     | NULL    |                |
+| category      | varchar(100) | YES  |     | NULL    |                |
+| language      | varchar(100) | YES  |     | NULL    |                |
+| release_date  | date         | YES  |     | NULL    |                |
+| status        | int          | YES  |     | NULL    |                |
+| movie_poster  | varchar(200) | YES  |     | NULL    |                |
+| genre         | varchar(200) | YES  |     | NULL    |                |
++---------------+--------------+------+-----+---------+----------------+
+9 rows in set (0.00 sec)
+
+mysql> DELETE FROM movie where field=genre;
+ERROR 1054 (42S22): Unknown column 'field' in 'where clause'
+mysql> insert into movie values(1,"Gadar 2: Ek Prem Katha","
+       insert into movie values(1,"Gadar 2: Ek Prem Katha","Gadar 2 brings back India`s most loved family of Tara, Sakeena and Jeete; 22 years after its predecessor. Set against the backdrop of Indo-Pakistan war of 1971, Tara Singh, once again, will face every enemy to protect the honor of country and family."Action,Drama","Hindi",'2023-08-11',10000000,"","");
+    "> ;
+    "> ^C
+mysql> alter table movie modify movie_details varchar(1000);
+Query OK, 0 rows affected (0.09 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> insert into movie values(1,"Gadar 2: Ek Prem Katha","Gadar 2 brings back India`s most loved family of Tara, Sakeena and Jeete; 22 years after its predecessor. Set against the backdrop of Indo-Pakistan war of 1971, Tara Singh, once again, will face every enemy to protect the honor of country and family."Action,Drama","Hindi",'2023-08-11',10000000,"","");
+    "> ^C
+mysql> insert into movie values(1,"Gadar 2: Ek Prem Katha","Gadar 2 brings back India`s most loved family of Tara, Sakeena and Jeete; 22 years after its predecessor. Set against the backdrop of Indo-Pakistan war of 1971, Tara Singh, once again, will face every enemy to protect the honor of country and family."Action,Drama","Hindi",'2023-08-11',10000000,"C:/Users/Anuja/Desktop/SO_Project/images/Gadar.jpeg","Drama");
+    "> ^C
+mysql> insert into movie values(1,"Gadar 2: Ek Prem Katha","Gadar 2 brings back India`s most loved family of Tara, Sakeena and Jeete; 22 years after its predecessor. Set against the backdrop of Indo-Pakistan war of 1971, Tara Singh, once again, will face every enemy to protect the honor of country and family.","Action,Drama","Hindi",'2023-08-11',10000000,"C:/Users/Anuja/Desktop/SO_Project/images/Gadar.jpeg","Drama");
+Query OK, 1 row affected (0.08 sec)
+
+mysql> insert into movie values(1,"Gadar 2: Ek Prem Katha","Gadar 2 brings back India`s most loved family of Tara, Sakeena and Jeete; 22 yeainsert into movie values(2,"Jailer","Muthuvel Pandian is a strict yet empathetic jailer who must stop a gang from trying to rescue their leader from prison.","Thriller,Action,Drama","Tamil,Malayalam,Kannada,Telugu,Hindi",'2023-08-10',10000000,"C:/Users/Anuja/Desktop/SO_Project/images/Jailer.jpg","Thriller");
+Query OK, 1 row affected (0.03 sec)
+
+mysql> select * from movie;
++----------+------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------------------+--------------------------------------+--------------+----------+-----------------------------------------------------+----------+
+| movie_id | movie_name             | movie_details
+
+                       | category              | language                             | release_date | status   | movie_poster                                        | genre    |
++----------+------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------------------+--------------------------------------+--------------+----------+-----------------------------------------------------+----------+
+|        1 | Gadar 2: Ek Prem Katha | Gadar 2 brings back India`s most loved family of Tara, Sakeena and Jeete; 22 years after its predecessor. Set against the backdrop of Indo-Pakistan war of 1971, Tara Singh, once again, will face every enemy to protect the honor of country and family. | Action,Drama          | Hindi                                | 2023-08-11   | 10000000 | C:/Users/Anuja/Desktop/SO_Project/images/Gadar.jpeg | Drama    |
+|        2 | Jailer                 | Muthuvel Pandian is a strict yet empathetic jailer who must stop a gang from trying to rescue their leader from prison.
+                       | Thriller,Action,Drama | Tamil,Malayalam,Kannada,Telugu,Hindi | 2023-08-10   | 10000000 | C:/Users/Anuja/Desktop/SO_Project/images/Jailer.jpg | Thriller |
++----------+------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------------------+--------------------------------------+--------------+----------+-----------------------------------------------------+----------+
+2 rows in set (0.00 sec)
+       ^C
+mysql> ^C
+mysql> desc movie_rating;
++-----------------+-------+------+-----+---------+----------------+
+| Field           | Type  | Null | Key | Default | Extra          |
++-----------------+-------+------+-----+---------+----------------+
+| movie_rating_id | int   | NO   | PRI | NULL    | auto_increment |
+| movie_id        | int   | YES  | MUL | NULL    |                |
+| user_id         | int   | YES  | MUL | NULL    |                |
+| rating          | float | YES  |     | NULL    |                |
++-----------------+-------+------+-----+---------+----------------+
+4 rows in set (0.01 sec)
+
+mysql> insert into movie_rating values(1,1,1,8.9);
+Query OK, 1 row affected (0.03 sec)
+
+mysql> insert into movie_rating values(2,1,1,7);
+Query OK, 1 row affected (0.03 sec)
+
+mysql> insert into movie_rating values(3,1,1,9);
+Query OK, 1 row affected (0.03 sec)
+
+mysql> insert into movie_rating values(4,2,1,9);
+Query OK, 1 row affected (0.03 sec)
+
+mysql> insert into movie_rating values(4,2,1,7.5);
+ERROR 1062 (23000): Duplicate entry '4' for key 'movie_rating.PRIMARY'
+mysql> insert into movie_rating values(5,2,1,7.5);
+Query OK, 1 row affected (0.03 sec)
+
+mysql> insert into movie_rating values(6,2,1,7);
+Query OK, 1 row affected (0.03 sec)
+
+mysql> desc movie_review;
++-----------------+---------------+------+-----+---------+----------------+
+| Field           | Type          | Null | Key | Default | Extra          |
++-----------------+---------------+------+-----+---------+----------------+
+| movie_reveiw_id | int           | NO   | PRI | NULL    | auto_increment |
+| movie_id        | int           | YES  | MUL | NULL    |                |
+| user_id         | int           | YES  | MUL | NULL    |                |
+| review          | varchar(1024) | YES  |     | NULL    |                |
++-----------------+---------------+------+-----+---------+----------------+
+4 rows in set (0.00 sec)
+
+mysql> insert into movie_review values(1,1,1,"Blockbuster");
+Query OK, 1 row affected (0.03 sec)
+
+mysql> insert into movie_review values(2,1,1,"Jai Hind");
+Query OK, 1 row affected (0.03 sec)
+
+mysql> insert into movie_review values(3,2,1,"Blockbuster");
+Query OK, 1 row affected (0.00 sec)
+
+mysql> insert into movie_review values(4,2,1,"Ok Ok Not so good");
+Query OK, 1 row affected (0.03 sec)
+
+mysql> desc user;
++--------------+--------------+------+-----+---------+----------------+
+| Field        | Type         | Null | Key | Default | Extra          |
++--------------+--------------+------+-----+---------+----------------+
+| user_id      | int          | NO   | PRI | NULL    | auto_increment |
+| first_name   | varchar(100) | YES  |     | NULL    |                |
+| last_name    | varchar(100) | YES  |     | NULL    |                |
+| email        | varchar(100) | YES  | UNI | NULL    |                |
+| phone_no     | varchar(100) | YES  |     | NULL    |                |
+| password     | varchar(100) | YES  |     | NULL    |                |
+| address_line | varchar(500) | YES  |     | NULL    |                |
+| city         | varchar(100) | YES  |     | NULL    |                |
+| state        | varchar(100) | YES  |     | NULL    |                |
+| country      | varchar(100) | YES  |     | NULL    |                |
+| pincode      | int          | YES  |     | NULL    |                |
+| role         | varchar(50)  | YES  |     | NULL    |                |
+| gender       | varchar(20)  | YES  |     | NULL    |                |
++--------------+--------------+------+-----+---------+----------------+
+13 rows in set (0.00 sec)
+
+mysql> insert into movie_review values(1,1,2,"Blockbuster,Action wow");
+ERROR 1062 (23000): Duplicate entry '1' for key 'movie_review.PRIMARY'
+mysql> insert into movie_review values(5,1,2,"Blockbuster,Action wow");
+Query OK, 1 row affected (0.03 sec)
+
+mysql> insert into movie_review values(6,2,2,"Acting was good,Super Direction");
+Query OK, 1 row affected (0.03 sec)
+
+mysql> show tables;
++--------------------+
+| Tables_in_showbuzz |
++--------------------+
+| city               |
+| movie              |
+| movie_rating       |
+| movie_review       |
+| orders             |
+| payment            |
+| screen             |
+| seat               |
+| seat_booking       |
+| shows              |
+| theatre            |
+| user               |
++--------------------+
+12 rows in set (0.00 sec)
+
+mysql> desc orders;
++------------+------------+------+-----+---------+----------------+
+| Field      | Type       | Null | Key | Default | Extra          |
++------------+------------+------+-----+---------+----------------+
+| order_id   | int        | NO   | PRI | NULL    | auto_increment |
+| booking_id | int        | YES  | MUL | NULL    |                |
+| user_id    | int        | YES  | MUL | NULL    |                |
+| payment_id | int        | YES  | MUL | NULL    |                |
+| movie_id   | int        | YES  | MUL | NULL    |                |
+| theatre_id | int        | YES  | MUL | NULL    |                |
+| screen_id  | int        | YES  | MUL | NULL    |                |
+| show_id    | int        | YES  | MUL | NULL    |                |
+| seat_id    | varchar(5) | YES  | MUL | NULL    |                |
+| show_date  | date       | YES  |     | NULL    |                |
+| show_time  | time       | YES  |     | NULL    |                |
++------------+------------+------+-----+---------+----------------+
+11 rows in set (0.03 sec)
+
+mysql> insert into orders values(1,1,1,1,1,1,1,1,"A1",'2023-08-11',12:00:00);
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ':00:00)' at line 1
+mysql> insert into orders values(1,1,1,1,1,1,1,1,"A1",'2023-08-11','12:00:00');
+ERROR 1452 (23000): Cannot add or update a child row: a foreign key constraint fails (`showbuzz`.`orders`, CONSTRAINT `orders_ibfk_2` FOREIGN KEY (`payment_id`) REFERENCES `payment` (`payment_id`))
+mysql> insert into orders values(1,1,1,1,1,1,1,1,"A1",'2023-08-11',"12:00:00");
+ERROR 1452 (23000): Cannot add or update a child row: a foreign key constraint fails (`showbuzz`.`orders`, CONSTRAINT `orders_ibfk_2` FOREIGN KEY (`payment_id`) REFERENCES `payment` (`payment_id`))
+mysql> desc theatre;
++--------------+--------------+------+-----+---------+----------------+
+| Field        | Type         | Null | Key | Default | Extra          |
++--------------+--------------+------+-----+---------+----------------+
+| theatre_id   | int          | NO   | PRI | NULL    | auto_increment |
+| name         | varchar(50)  | YES  |     | NULL    |                |
+| city_id      | int          | YES  | MUL | NULL    |                |
+| user_id      | int          | YES  | MUL | NULL    |                |
+| address      | varchar(200) | YES  |     | NULL    |                |
+| no_of_screen | int          | YES  |     | NULL    |                |
+| key1         | varchar(500) | YES  |     | NULL    |                |
+| key2         | varchar(500) | YES  |     | NULL    |                |
++--------------+--------------+------+-----+---------+----------------+
+8 rows in set (0.00 sec)
+
+mysql> insert into theatre values(1,"PVR",1,1,"Karvenagar",1,"abc","xyz");
+Query OK, 1 row affected (0.03 sec)
+
+mysql> insert into theatre values(1,"PVR",2,1,"Airoli",1,"abc","xyz");
+ERROR 1062 (23000): Duplicate entry '1' for key 'theatre.PRIMARY'
+mysql> insert into theatre values(2,"PVR",2,1,"Airoli",1,"abc","xyz");
+Query OK, 1 row affected (0.03 sec)
+
+mysql> insert into theatre values(3,"PVR",3,1,"5 no chowk",1,"abc","xyz");
+Query OK, 1 row affected (0.03 sec)
+
+mysql> insert into theatre values(4,"PVR",4,1,"Shivaji chowk",1,"abc","xyz");
+Query OK, 1 row affected (0.03 sec)
+
+mysql> insert into theatre values(5,"PVR",5,1,"Sambhaji chowk",1,"abc","xyz");
+Query OK, 1 row affected (0.03 sec)
+
+mysql> desc shows;
++-------------+-------+------+-----+---------+----------------+
+| Field       | Type  | Null | Key | Default | Extra          |
++-------------+-------+------+-----+---------+----------------+
+| show_id     | int   | NO   | PRI | NULL    | auto_increment |
+| movie_id    | int   | YES  | MUL | NULL    |                |
+| screen_id   | int   | YES  | MUL | NULL    |                |
+| cost_factor | float | YES  |     | NULL    |                |
+| showdate    | date  | YES  |     | NULL    |                |
+| showtime    | time  | YES  |     | NULL    |                |
++-------------+-------+------+-----+---------+----------------+
+6 rows in set (0.00 sec)
+
+mysql> select * from movie;
++----------+------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------------------+--------------------------------------+--------------+----------+-----------------------------------------------------+----------+
+| movie_id | movie_name             | movie_details
+                                                                                                                                     | category
+ | language                             | release_date | status   | movie_poster                                        | genre    |
++----------+------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------------------+--------------------------------------+--------------+----------+-----------------------------------------------------+----------+
+|        1 | Gadar 2: Ek Prem Katha | Gadar 2 brings back India`s most loved family of Tara, Sakeena and Jeete; 22 years after its predecessor. Set against the backdrop of Indo-Pakistan war of 1971, Tara Singh, once again, will face every enemy to protect the honor of country and family. | Action,Drama
+ | Hindi                                | 2023-08-11   | 10000000 | C:/Users/Anuja/Desktop/SO_Project/images/Gadar.jpeg | Drama    |
+|        2 | Jailer                 | Muthuvel Pandian is a strict yet empathetic jailer who must stop a gang from trying to rescue their leader from prison.                                                                                                                                    | Thriller,Action,Drama | Tamil,Malayalam,Kannada,Telugu,Hindi | 2023-08-10   | 10000000 | C:/Users/Anuja/Desktop/SO_Project/images/Jailer.jpg | Thriller |
++----------+------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------------------+--------------------------------------+--------------+----------+-----------------------------------------------------+----------+
+2 rows in set (0.02 sec)
+
+mysql> desc shows;
++-------------+-------+------+-----+---------+----------------+
+| Field       | Type  | Null | Key | Default | Extra          |
++-------------+-------+------+-----+---------+----------------+
+| show_id     | int   | NO   | PRI | NULL    | auto_increment |
+| movie_id    | int   | YES  | MUL | NULL    |                |
+| screen_id   | int   | YES  | MUL | NULL    |                |
+| cost_factor | float | YES  |     | NULL    |                |
+| showdate    | date  | YES  |     | NULL    |                |
+| showtime    | time  | YES  |     | NULL    |                |
++-------------+-------+------+-----+---------+----------------+
+6 rows in set (0.00 sec)
+
+mysql> insert into shows values(1,1,1,250,'2023-08-11',"11:15:00");
+ERROR 1452 (23000): Cannot add or update a child row: a foreign key constraint fails (`showbuzz`.`shows`, CONSTRAINT `shows_ibfk_2` FOREIGN KEY (`screen_id`) REFERENCES `screen` (`screen_id`))
+mysql> desc screen;
++------------+------+------+-----+---------+----------------+
+| Field      | Type | Null | Key | Default | Extra          |
++------------+------+------+-----+---------+----------------+
+| screen_id  | int  | NO   | PRI | NULL    | auto_increment |
+| screen_no  | int  | YES  |     | NULL    |                |
+| theatre_id | int  | YES  | MUL | NULL    |                |
++------------+------+------+-----+---------+----------------+
+3 rows in set (0.00 sec)
+
+mysql> insert into screen values(1,1,1);
+Query OK, 1 row affected (0.03 sec)
+
+mysql> insert into screen values(2,2,2);
+Query OK, 1 row affected (0.03 sec)
+
+mysql> insert into screen values(3,3,3);
+Query OK, 1 row affected (0.03 sec)
+
+mysql> insert into shows values(1,1,1,250,'2023-08-11',"11:15:00");
+Query OK, 1 row affected (0.03 sec)
+
+mysql> insert into shows values(2,1,1,250,'2023-08-11',"1:00:00");
+Query OK, 1 row affected (0.00 sec)
+
+mysql> insert into shows values(3,1,1,275,'2023-08-11',"3:15:00");
+Query OK, 1 row affected (0.03 sec)
+
+mysql> insert into shows values(4,1,1,300,'2023-08-11',"6:20:00");
+Query OK, 1 row affected (0.03 sec)
+
+mysql> insert into shows values(5,1,1,320,'2023-08-11',"7:10:00");
+Query OK, 1 row affected (0.03 sec)
+
+mysql> insert into shows values(6,1,1,360,'2023-08-11',"10:15:00");
+Query OK, 1 row affected (0.03 sec)
+
+mysql> select * from screen;
++-----------+-----------+------------+
+| screen_id | screen_no | theatre_id |
++-----------+-----------+------------+
+|         1 |         1 |          1 |
+|         2 |         2 |          2 |
+|         3 |         3 |          3 |
++-----------+-----------+------------+
+3 rows in set (0.00 sec)
+
+mysql> select * from shows;
++---------+----------+-----------+-------------+------------+----------+
+| show_id | movie_id | screen_id | cost_factor | showdate   | showtime |
++---------+----------+-----------+-------------+------------+----------+
+|       1 |        1 |         1 |         250 | 2023-08-11 | 11:15:00 |
+|       2 |        1 |         1 |         250 | 2023-08-11 | 01:00:00 |
+|       3 |        1 |         1 |         275 | 2023-08-11 | 03:15:00 |
+|       4 |        1 |         1 |         300 | 2023-08-11 | 06:20:00 |
+|       5 |        1 |         1 |         320 | 2023-08-11 | 07:10:00 |
+|       6 |        1 |         1 |         360 | 2023-08-11 | 10:15:00 |
++---------+----------+-----------+-------------+------------+----------+
+6 rows in set (0.00 sec)
+
+mysql> desc seat;
++-----------+-------------+------+-----+---------+-------+
+| Field     | Type        | Null | Key | Default | Extra |
++-----------+-------------+------+-----+---------+-------+
+| seat_id   | varchar(5)  | NO   | PRI | NULL    |       |
+| seat_type | varchar(25) | YES  |     | NULL    |       |
+| price     | float       | YES  |     | NULL    |       |
++-----------+-------------+------+-----+---------+-------+
+3 rows in set (0.00 sec)
+
+mysql> select * from seat;
+Empty set (0.00 sec)
+
+mysql> insert into seat values("A","Platinum",360);
+Query OK, 1 row affected (0.03 sec)
+
+mysql> insert into seat values("B","Gold",330);
+Query OK, 1 row affected (0.03 sec)
+
+mysql> insert into seat values("C","Silver",315);
+Query OK, 1 row affected (0.03 sec)
+
+mysql> select * from seat;
++---------+-----------+-------+
+| seat_id | seat_type | price |
++---------+-----------+-------+
+| A       | Platinum  |   360 |
+| B       | Gold      |   330 |
+| C       | Silver    |   315 |
++---------+-----------+-------+
+3 rows in set (0.00 sec)
+
+mysql> desc seat_booking;
++-------------------+--------------+------+-----+-------------------+-------------------+
+| Field             | Type         | Null | Key | Default           | Extra             |
++-------------------+--------------+------+-----+-------------------+-------------------+
+| booking_id        | int          | NO   | PRI | NULL              | auto_increment    |
+| show_id           | int          | YES  | MUL | NULL              |                   |
+| seat_id           | varchar(5)   | YES  | MUL | NULL              |                   |
+| user_id           | int          | YES  | MUL | NULL              |                   |
+| booking_date      | date         | YES  |     | NULL              |                   |
+| created_timestamp | timestamp    | YES  |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED |
+| order_id          | varchar(500) | YES  |     | NULL              |                   |
+| payment_status    | int          | YES  |     | NULL              |                   |
++-------------------+--------------+------+-----+-------------------+-------------------+
+8 rows in set (0.00 sec)
+
+mysql> desc orders;
++------------+------------+------+-----+---------+----------------+
+| Field      | Type       | Null | Key | Default | Extra          |
++------------+------------+------+-----+---------+----------------+
+| order_id   | int        | NO   | PRI | NULL    | auto_increment |
+| booking_id | int        | YES  | MUL | NULL    |                |
+| user_id    | int        | YES  | MUL | NULL    |                |
+| payment_id | int        | YES  | MUL | NULL    |                |
+| movie_id   | int        | YES  | MUL | NULL    |                |
+| theatre_id | int        | YES  | MUL | NULL    |                |
+| screen_id  | int        | YES  | MUL | NULL    |                |
+| show_id    | int        | YES  | MUL | NULL    |                |
+| seat_id    | varchar(5) | YES  | MUL | NULL    |                |
+| show_date  | date       | YES  |     | NULL    |                |
+| show_time  | time       | YES  |     | NULL    |                |
++------------+------------+------+-----+---------+----------------+
+11 rows in set (0.00 sec)
+
+mysql> insert into orders values(1,1,1,1,1,1,1,1,"A",'2023-08-11',"03:15:00");
+ERROR 1452 (23000): Cannot add or update a child row: a foreign key constraint fails (`showbuzz`.`orders`, CONSTRAINT `orders_ibfk_2` FOREIGN KEY (`payment_id`) REFERENCES `payment` (`payment_id`))
+mysql> desc payment;
++---------------------+--------------+------+-----+-------------------+-------------------+
+| Field               | Type         | Null | Key | Default           | Extra             |
++---------------------+--------------+------+-----+-------------------+-------------------+
+| payment_id          | int          | NO   | PRI | NULL              | auto_increment    |
+| razorpay_payment_id | varchar(500) | YES  |     | NULL              |                   |
+| order_id            | varchar(500) | YES  |     | NULL              |                   |
+| signature           | varchar(500) | YES  |     | NULL              |                   |
+| user_id             | int          | YES  | MUL | NULL              |                   |
+| totalAmount         | float        | YES  |     | NULL              |                   |
+| payment_timestamp   | timestamp    | YES  |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED |
++---------------------+--------------+------+-----+-------------------+-------------------+
+7 rows in set (0.00 sec)
+
+mysql> drop table movie;
+ERROR 3730 (HY000): Cannot drop table 'movie' referenced by a foreign key constraint 'movie_rating_ibfk_1' on table 'movie_rating'.
+mysql> select * from movie;
++----------+------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------------------+--------------------------------------+--------------+----------+-----------------------------------------------------+----------+
+| movie_id | movie_name             | movie_details
+
+                       | category              | language                             | release_date | status   | movie_poster                                        | genre    |
++----------+------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------------------+--------------------------------------+--------------+----------+-----------------------------------------------------+----------+
+|        1 | Gadar 2: Ek Prem Katha | Gadar 2 brings back India`s most loved family of Tara, Sakeena and Jeete; 22 years after its predecessor. Set against the backdrop of Indo-Pakistan war of 1971, Tara Singh, once again, will face every enemy to protect the honor of country and family. | Action,Drama          | Hindi                                | 2023-08-11   | 10000000 | C:/Users/Anuja/Desktop/SO_Project/images/Gadar.jpeg | Drama    |
+|        2 | Jailer                 | Muthuvel Pandian is a strict yet empathetic jailer who must stop a gang from trying to rescue their leader from prison.
+                       | Thriller,Action,Drama | Tamil,Malayalam,Kannada,Telugu,Hindi | 2023-08-10   | 10000000 | C:/Users/Anuja/Desktop/SO_Project/images/Jailer.jpg | Thriller |
++----------+------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------------------+--------------------------------------+--------------+----------+-----------------------------------------------------+----------+
+2 rows in set (0.00 sec)
+
+mysql> delete from movie where movie_id=1;
+ERROR 1451 (23000): Cannot delete or update a parent row: a foreign key constraint fails (`showbuzz`.`movie_rating`, CONSTRAINT `movie_rating_ibfk_1` FOREIGN KEY (`movie_id`) REFERENCES `movie` (`movie_id`))
+mysql> select * from user;
++---------+------------+-------------+-----------------+------------+--------------------------------------------------------------+------------------+--------+-------------+---------+---------+------+--------+
+| user_id | first_name | last_name   | email           | phone_no   | password                                                     | address_line     | city   | state       | country | pincode | role | gender |
++---------+------------+-------------+-----------------+------------+--------------------------------------------------------------+------------------+--------+-------------+---------+---------+------+--------+
+|       1 | anuja      | suryawanshi | anuja@gmail.com | 9876543210 | $2a$10$VL8rTfxRcqV2/PMnfH6pZumg95Ag6Fkg2TLbXhYJfDxxd2YnaKNlq | Moti Nagar Latur | Latur  | Maharashtra | India   |  413512 | user | female |
+|       2 | kapil      | lakamote    | kapil@gmail.com | 9090808070 | $2a$10$5CqHWZ.0lL6.1lSIXPAoTuIe/QkOmFNIIT0sdu2NNgxeFO4xNvuzC | At post Ekurga   | Omerga | Maharashtra | India   |  413604 | user | NULL   |
++---------+------------+-------------+-----------------+------------+--------------------------------------------------------------+------------------+--------+-------------+---------+---------+------+--------+
+2 rows in set (0.03 sec)
+
+mysql> desc user;
++--------------+--------------+------+-----+---------+----------------+
+| Field        | Type         | Null | Key | Default | Extra          |
++--------------+--------------+------+-----+---------+----------------+
+| user_id      | int          | NO   | PRI | NULL    | auto_increment |
+| first_name   | varchar(100) | YES  |     | NULL    |                |
+| last_name    | varchar(100) | YES  |     | NULL    |                |
+| email        | varchar(100) | YES  | UNI | NULL    |                |
+| phone_no     | varchar(100) | YES  |     | NULL    |                |
+| password     | varchar(100) | YES  |     | NULL    |                |
+| address_line | varchar(500) | YES  |     | NULL    |                |
+| city         | varchar(100) | YES  |     | NULL    |                |
+| state        | varchar(100) | YES  |     | NULL    |                |
+| country      | varchar(100) | YES  |     | NULL    |                |
+| pincode      | int          | YES  |     | NULL    |                |
+| role         | varchar(50)  | YES  |     | NULL    |                |
+| gender       | varchar(20)  | YES  |     | NULL    |                |
++--------------+--------------+------+-----+---------+----------------+
+13 rows in set (0.03 sec)
+
+mysql> insert into user values(3,"Anka","Patil","anka@gmail.com","9191919191","anka@123","At post Ekurga","Dharashiv","Maharashtra","India",411604,"Admin","female");
+Query OK, 1 row affected (0.01 sec)
+
+mysql> select * from user;
++---------+------------+-------------+-----------------+------------+--------------------------------------------------------------+------------------+-----------+-------------+---------+---------+-------+--------+
+| user_id | first_name | last_name   | email           | phone_no   | password                                                     | address_line     | city      | state       | country | pincode | role  | gender |
++---------+------------+-------------+-----------------+------------+--------------------------------------------------------------+------------------+-----------+-------------+---------+---------+-------+--------+
+|       1 | anuja      | suryawanshi | anuja@gmail.com | 9876543210 | $2a$10$VL8rTfxRcqV2/PMnfH6pZumg95Ag6Fkg2TLbXhYJfDxxd2YnaKNlq | Moti Nagar Latur | Latur     | Maharashtra | India   |  413512 | user  | female |
+|       2 | kapil      | lakamote    | kapil@gmail.com | 9090808070 | $2a$10$5CqHWZ.0lL6.1lSIXPAoTuIe/QkOmFNIIT0sdu2NNgxeFO4xNvuzC | At post Ekurga   | Omerga    | Maharashtra | India   |  413604 | user  | NULL   |
+|       3 | Anka       | Patil       | anka@gmail.com  | 9191919191 | anka@123                                                     | At post Ekurga   | Dharashiv | Maharashtra | India   |  411604 | Admin | female |
++---------+------------+-------------+-----------------+------------+--------------------------------------------------------------+------------------+-----------+-------------+---------+---------+-------+--------+
+3 rows in set (0.00 sec)
+
+mysql> delete user_id from user where user_id=3;
+ERROR 1109 (42S02): Unknown table 'user_id' in MULTI DELETE
+mysql> delete from user where user_id=3;
+Query OK, 1 row affected (0.05 sec)
+
+mysql> select * from user;
++---------+------------+-------------+-----------------+------------+--------------------------------------------------------------+------------------+--------+-------------+---------+---------+------+--------+
+| user_id | first_name | last_name   | email           | phone_no   | password                                                     | address_line     | city   | state       | country | pincode | role | gender |
++---------+------------+-------------+-----------------+------------+--------------------------------------------------------------+------------------+--------+-------------+---------+---------+------+--------+
+|       1 | anuja      | suryawanshi | anuja@gmail.com | 9876543210 | $2a$10$VL8rTfxRcqV2/PMnfH6pZumg95Ag6Fkg2TLbXhYJfDxxd2YnaKNlq | Moti Nagar Latur | Latur  | Maharashtra | India   |  413512 | user | female |
+|       2 | kapil      | lakamote    | kapil@gmail.com | 9090808070 | $2a$10$5CqHWZ.0lL6.1lSIXPAoTuIe/QkOmFNIIT0sdu2NNgxeFO4xNvuzC | At post Ekurga   | Omerga | Maharashtra | India   |  413604 | user | NULL   |
++---------+------------+-------------+-----------------+------------+--------------------------------------------------------------+------------------+--------+-------------+---------+---------+------+--------+
+2 rows in set (0.00 sec)
+
+mysql> select * from user;
++---------+------------+-------------+-----------------+------------+--------------------------------------------------------------+------------------+--------+-------------+---------+---------+------+--------+
+| user_id | first_name | last_name   | email           | phone_no   | password                                                     | address_line     | city   | state       | country | pincode | role | gender |
++---------+------------+-------------+-----------------+------------+--------------------------------------------------------------+------------------+--------+-------------+---------+---------+------+--------+
+|       1 | anuja      | suryawanshi | anuja@gmail.com | 9876543210 | $2a$10$VL8rTfxRcqV2/PMnfH6pZumg95Ag6Fkg2TLbXhYJfDxxd2YnaKNlq | Moti Nagar Latur | Latur  | Maharashtra | India   |  413512 | user | female |
+|       2 | kapil      | lakamote    | kapil@gmail.com | 9090808070 | $2a$10$5CqHWZ.0lL6.1lSIXPAoTuIe/QkOmFNIIT0sdu2NNgxeFO4xNvuzC | At post Ekurga   | Omerga | Maharashtra | India   |  413604 | user | NULL   |
+|       4 | anka       | lakamote    | anka@gmail.com  | NULL       | $2a$10$zXwaFd9CVJ8L243quban6uxtTBmYQ3nOCGhSt0irsyGggKDOjZ.dO | NULL             | NULL   | NULL        | NULL    |       0 | user | NULL   |
++---------+------------+-------------+-----------------+------------+--------------------------------------------------------------+------------------+--------+-------------+---------+---------+------+--------+
+3 rows in set (0.00 sec)
+
+mysql> alter table user modify user_id=4;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '=4' at line 1
+mysql> alter table user modify role;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '' at line 1
+mysql> alter table user modify add role;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'add role' at line 1
+mysql> update user set address_line="at post ekurga", city="dharashiv", country="india", email="anka@gmail.com", first_name="anka", gender="female", last_name="lakamote", password=?, phone_no="9347237673, pincode=411604, role="Admin", state="Maharashtra" where user_id=4;
+    "> ^C
+mysql> update user set address_line="at post ekurga", city="dharashiv", country="india", email="anka@gmail.com", first_name="anka", gender="female", last_name="lakamote", password=anka@123, phone_no="9347237673, pincode=411604, role="Admin", state="Maharashtra" where user_id=4;
+    "> ;
+    "> ^C
+mysql> update user set (address_line="at post ekurga", city="dharashiv", country="india", email="anka@gmail.com", first_name="anka", gender="female", last_name="lakamote", password=anka@123, phone_no="9347237673, pincode=411604, role="Admin", state="Maharashtra") where user_id=4;
+    ">
+    ">
+    "> ^C
+mysql> update user set (address_line=at post ekurga, city=dharashiv, country="india", email="anka@gmail.com", first_name="anka", gender="female", last_name="lakamote", password=anka@123, phone_no="9347237673, pincode=411604, role="Admin", state="Maharashtra") where user_id=4;
+    "> ^C
+mysql> update user set (address_line=at post ekurga, city=dharashiv, country="india", email="anka@gmail.com", first_name="anka", gender="female", last_name="lakamote", password=anka@123, phone_no="9347237673, p^Ccode=411604, role=Admin, state=Maharashtra where user_mysql> update user set (address_line="at post ekurga", city="dharashiv", country="india", email="anka@gmail.com", first_name="anka", gender="female", last_name="lakamote", password=anka@123, phone_no="9347237673", pincode=411604, role="Admin", state="Maharashtra") where user_id=4;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '(address_line="at post ekurga", city="dharashiv", country="india", email="anka@g' at line 1
+mysql> update user set address_line="at post ekurga", city="dharashiv", country="india", email="anka@gmail.com", first_name="anka", gender="female", last_name="lakamote", password=anka@123, phone_no="9347237673", pincode=411604, role="Admin", state="Maharashtra" where user_id=4;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '@123, phone_no="9347237673", pincode=411604, role="Admin", state="Maharashtra" w' at line 1
+mysql> update user set role="Admin" where user_id=4;
+Query OK, 1 row affected (0.05 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> desc user;
++--------------+--------------+------+-----+---------+----------------+
+| Field        | Type         | Null | Key | Default | Extra          |
++--------------+--------------+------+-----+---------+----------------+
+| user_id      | int          | NO   | PRI | NULL    | auto_increment |
+| first_name   | varchar(100) | YES  |     | NULL    |                |
+| last_name    | varchar(100) | YES  |     | NULL    |                |
+| email        | varchar(100) | YES  | UNI | NULL    |                |
+| phone_no     | varchar(100) | YES  |     | NULL    |                |
+| password     | varchar(100) | YES  |     | NULL    |                |
+| address_line | varchar(500) | YES  |     | NULL    |                |
+| city         | varchar(100) | YES  |     | NULL    |                |
+| state        | varchar(100) | YES  |     | NULL    |                |
+| country      | varchar(100) | YES  |     | NULL    |                |
+| pincode      | int          | YES  |     | NULL    |                |
+| role         | varchar(50)  | YES  |     | NULL    |                |
+| gender       | varchar(20)  | YES  |     | NULL    |                |
++--------------+--------------+------+-----+---------+----------------+
+13 rows in set (0.03 sec)
+
+mysql> select * from movie;
++----------+------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------------------+--------------------------------------+--------------+----------+-----------------------------------------------------+----------+
+| movie_id | movie_name             | movie_details
+
+                       | category              | language                             | release_date | status   | movie_poster                                        | genre    |
++----------+------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------------------+--------------------------------------+--------------+----------+-----------------------------------------------------+----------+
+|        1 | Gadar 2: Ek Prem Katha | Gadar 2 brings back India`s most loved family of Tara, Sakeena and Jeete; 22 years after its predecessor. Set against the backdrop of Indo-Pakistan war of 1971, Tara Singh, once again, will face every enemy to protect the honor of country and family. | Action,Drama          | Hindi                                | 2023-08-11   | 10000000 | C:/Users/Anuja/Desktop/SO_Project/images/Gadar.jpeg | Drama    |
+|        2 | Jailer                 | Muthuvel Pandian is a strict yet empathetic jailer who must stop a gang from trying to rescue their leader from prison.
+                       | Thriller,Action,Drama | Tamil,Malayalam,Kannada,Telugu,Hindi | 2023-08-10   | 10000000 | C:/Users/Anuja/Desktop/SO_Project/images/Jailer.jpg | Thriller |
++----------+------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------------------+--------------------------------------+--------------+----------+-----------------------------------------------------+----------+
+2 rows in set (0.00 sec)
+
+mysql>
+       select * from screen;
++-----------+-----------+------------+
+| screen_id | screen_no | theatre_id |
++-----------+-----------+------------+
+|         1 |         1 |          1 |
+|         2 |         2 |          2 |
+|         3 |         3 |          3 |
++-----------+-----------+------------+
+3 rows in set (0.04 sec)
+
+mysql> select * from shows;
++---------+----------+-----------+-------------+------------+----------+
+| show_id | movie_id | screen_id | cost_factor | showdate   | showtime |
++---------+----------+-----------+-------------+------------+----------+
+|       1 |        1 |         1 |         250 | 2023-08-11 | 11:15:00 |
+|       2 |        1 |         1 |         250 | 2023-08-11 | 01:00:00 |
+|       3 |        1 |         1 |         275 | 2023-08-11 | 03:15:00 |
+|       4 |        1 |         1 |         300 | 2023-08-11 | 06:20:00 |
+|       5 |        1 |         1 |         320 | 2023-08-11 | 07:10:00 |
+|       6 |        1 |         1 |         360 | 2023-08-11 | 10:15:00 |
++---------+----------+-----------+-------------+------------+----------+
+6 rows in set (0.00 sec)
+
+mysql> show tables;
++--------------------+
+| Tables_in_showbuzz |
++--------------------+
+| city               |
+| movie              |
+| movie_rating       |
+| movie_review       |
+| orders             |
+| payment            |
+| screen             |
+| seat               |
+| seat_booking       |
+| shows              |
+| theatre            |
+| user               |
++--------------------+
+12 rows in set (0.05 sec)
+
+mysql> desc movie;
++---------------+---------------+------+-----+---------+----------------+
+| Field         | Type          | Null | Key | Default | Extra          |
++---------------+---------------+------+-----+---------+----------------+
+| movie_id      | int           | NO   | PRI | NULL    | auto_increment |
+| movie_name    | varchar(100)  | YES  |     | NULL    |                |
+| movie_details | varchar(1000) | YES  |     | NULL    |                |
+| category      | varchar(100)  | YES  |     | NULL    |                |
+| language      | varchar(100)  | YES  |     | NULL    |                |
+| release_date  | date          | YES  |     | NULL    |                |
+| status        | int           | YES  |     | NULL    |                |
+| movie_poster  | varchar(200)  | YES  |     | NULL    |                |
+| genre         | varchar(200)  | YES  |     | NULL    |                |
++---------------+---------------+------+-----+---------+----------------+
+9 rows in set (0.03 sec)
+
+mysql> ELECT * FROM theatre t WHERE t.user_id = 2
+    -> ;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'ELECT * FROM theatre t WHERE t.user_id = 2' at line 1
+mysql> ELECT * FROM theatre WHERE user_id = 2;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'ELECT * FROM theatre WHERE user_id = 2' at line 1
+mysql> ELECT * FROM theatre WHERE user_id = 1;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'ELECT * FROM theatre WHERE user_id = 1' at line 1
+mysql> SELECT * FROM theatre WHERE user_id = 1;
++------------+------+---------+---------+----------------+--------------+------+------+
+| theatre_id | name | city_id | user_id | address        | no_of_screen | key1 | key2 |
++------------+------+---------+---------+----------------+--------------+------+------+
+|          1 | PVR  |       1 |       1 | Karvenagar     |            1 | abc  | xyz  |
+|          2 | PVR  |       2 |       1 | Airoli         |            1 | abc  | xyz  |
+|          3 | PVR  |       3 |       1 | 5 no chowk     |            1 | abc  | xyz  |
+|          4 | PVR  |       4 |       1 | Shivaji chowk  |            1 | abc  | xyz  |
+|          5 | PVR  |       5 |       1 | Sambhaji chowk |            1 | abc  | xyz  |
++------------+------+---------+---------+----------------+--------------+------+------+
+5 rows in set (0.03 sec)
+
+mysql> SELECT * FROM theatre WHERE user_id = 2;
+Empty set (0.00 sec)
+
+mysql> Desc theatre
+    -> ;
++--------------+--------------+------+-----+---------+----------------+
+| Field        | Type         | Null | Key | Default | Extra          |
++--------------+--------------+------+-----+---------+----------------+
+| theatre_id   | int          | NO   | PRI | NULL    | auto_increment |
+| name         | varchar(50)  | YES  |     | NULL    |                |
+| city_id      | int          | YES  | MUL | NULL    |                |
+| user_id      | int          | YES  | MUL | NULL    |                |
+| address      | varchar(200) | YES  |     | NULL    |                |
+| no_of_screen | int          | YES  |     | NULL    |                |
+| key1         | varchar(500) | YES  |     | NULL    |                |
+| key2         | varchar(500) | YES  |     | NULL    |                |
++--------------+--------------+------+-----+---------+----------------+
+8 rows in set (0.00 sec)
+
+mysql> insert into theatre values(1,"PVR",1,4,"Karvenagar",1,"abc","xyz");
+ERROR 1062 (23000): Duplicate entry '1' for key 'theatre.PRIMARY'
+mysql> insert into theatre values(6,"PVR",1,4,"Karvenagar",1,"abc","xyz");
+Query OK, 1 row affected (0.03 sec)
+
+mysql> insert into theatre values(7,"PVR",2,1,"Airoli",1,"abc","xyz");
+Query OK, 1 row affected (0.03 sec)
+
+mysql> insert into theatre values(8,"PVR",3,1,"5 no chowk",1,"abc","xyz");
+Query OK, 1 row affected (0.03 sec)
+
+mysql> insert into theatre values(9,"PVR",4,1,"Shivaji chowk",1,"abc","xyz");
+Query OK, 1 row affected (0.03 sec)
+
+mysql> insert into theatre values(10,"PVR",5,1,"Sambhaji chowk",1,"abc","xyz");
+Query OK, 1 row affected (0.03 sec)
+
+mysql> select * from city;
++---------+-----------+-------------+--------------+
+| city_id | city_name | city_state  | city_pincode |
++---------+-----------+-------------+--------------+
+|       1 | Pune      | Maharashtra |       411001 |
+|       2 | Mumbai    | Maharashtra |       400001 |
+|       3 | Latur     | Maharashtra |       413512 |
+|       4 | Kolhapur  | Maharashtra |       416216 |
+|       5 | Sangli    | Maharashtra |       411211 |
++---------+-----------+-------------+--------------+
+5 rows in set (0.00 sec)
+
+mysql> desc city;
++--------------+--------------+------+-----+---------+----------------+
+| Field        | Type         | Null | Key | Default | Extra          |
++--------------+--------------+------+-----+---------+----------------+
+| city_id      | int          | NO   | PRI | NULL    | auto_increment |
+| city_name    | varchar(100) | YES  |     | NULL    |                |
+| city_state   | varchar(100) | YES  |     | NULL    |                |
+| city_pincode | int          | YES  |     | NULL    |                |
++--------------+--------------+------+-----+---------+----------------+
+4 rows in set (0.00 sec)
+
+mysql> desc movie;
++---------------+---------------+------+-----+---------+----------------+
+| Field         | Type          | Null | Key | Default | Extra          |
++---------------+---------------+------+-----+---------+----------------+
+| movie_id      | int           | NO   | PRI | NULL    | auto_increment |
+| movie_name    | varchar(100)  | YES  |     | NULL    |                |
+| movie_details | varchar(1000) | YES  |     | NULL    |                |
+| category      | varchar(100)  | YES  |     | NULL    |                |
+| language      | varchar(100)  | YES  |     | NULL    |                |
+| release_date  | date          | YES  |     | NULL    |                |
+| status        | int           | YES  |     | NULL    |                |
+| movie_poster  | varchar(200)  | YES  |     | NULL    |                |
+| genre         | varchar(200)  | YES  |     | NULL    |                |
++---------------+---------------+------+-----+---------+----------------+
+9 rows in set (0.00 sec)
+
+mysql> show tables;
++--------------------+
+| Tables_in_showbuzz |
++--------------------+
+| city               |
+| movie              |
+| movie_rating       |
+| movie_review       |
+| orders             |
+| payment            |
+| screen             |
+| seat               |
+| seat_booking       |
+| shows              |
+| theatre            |
+| user               |
++--------------------+
+12 rows in set (0.00 sec)
+
+mysql> SELECT * FROM movie order by movie_id desc;
++----------+------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------------------+--------------------------------------+--------------+----------+-----------------------------------------------------+----------+
+| movie_id | movie_name             | movie_details
+                                                                                                                                     | category
+ | language                             | release_date | status   | movie_poster                                        | genre    |
++----------+------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------------------+--------------------------------------+--------------+----------+-----------------------------------------------------+----------+
+|        2 | Jailer                 | Muthuvel Pandian is a strict yet empathetic jailer who must stop a gang from trying to rescue their leader from prison.                                                                                                                                    | Thriller,Action,Drama | Tamil,Malayalam,Kannada,Telugu,Hindi | 2023-08-10   | 10000000 | C:/Users/Anuja/Desktop/SO_Project/images/Jailer.jpg | Thriller |
+|        1 | Gadar 2: Ek Prem Katha | Gadar 2 brings back India`s most loved family of Tara, Sakeena and Jeete; 22 years after its predecessor. Set against the backdrop of Indo-Pakistan war of 1971, Tara Singh, once again, will face every enemy to protect the honor of country and family. | Action,Drama
+ | Hindi                                | 2023-08-11   | 10000000 | C:/Users/Anuja/Desktop/SO_Project/images/Gadar.jpeg | Drama    |
++----------+------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------------------+--------------------------------------+--------------+----------+-----------------------------------------------------+----------+
+2 rows in set (0.00 sec)
+
+mysql> SELECT * FROM screen  WHERE theatre_id = 1;
++-----------+-----------+------------+
+| screen_id | screen_no | theatre_id |
++-----------+-----------+------------+
+|         1 |         1 |          1 |
++-----------+-----------+------------+
+1 row in set (0.00 sec)
+
+mysql> select theatre0_.theatre_id as theatre_1_10_0_, theatre0_.address as address2_10_0_, theatre0_.city_id as city_id7_10_0_, theatre0_.key1 as key3_10_0_, theatre0_.key2 as key4_10_0_, theatre0_.name as name5_10_0_, theatre0_.no_of_screen as no_of_sc6_10_0_, theatre0_.user_id as user_id8_10_0_, city1_.city_id as city_id1_0_1_, city1_.city_name as city_nam2_0_1_, city1_.city_pincode as city_pin3_0_1_, city1_.city_state as city_sta4_0_1_, user2_.user_id as user_id1_11_2_, user2_.address_line as address_2_11_2_, user2_.city as city3_11_2_, user2_.country as country4_11_2_, user2_.email as email5_11_2_, user2_.first_name as first_na6_11_2_, user2_.gender as gender7_11_2_, user2_.last_name as last_nam8_11_2_, user2_.password as password9_11_2_, user2_.phone_no as phone_n10_11_2_, user2_.pincode as pincode11_11_2_, user2_.role as role12_11_2_, user2_.state as state13_11_2_ from theatre theatre0_ left outer join city city1_ on theatre0_.city_id=city1_.city_id left outer join user user2_ on theatre0_.user_id=user2_.user_id where theatre0_.theatre_id=?
+    -> ^C
+mysql> select * from user;
++---------+------------+-------------+-----------------+------------+--------------------------------------------------------------+------------------+--------+-------------+---------+---------+-------+--------+
+| user_id | first_name | last_name   | email           | phone_no   | password                                                     | address_line     | city   | state       | country | pincode | role  | gender |
++---------+------------+-------------+-----------------+------------+--------------------------------------------------------------+------------------+--------+-------------+---------+---------+-------+--------+
+|       1 | anuja      | suryawanshi | anuja@gmail.com | 9876543210 | $2a$10$VL8rTfxRcqV2/PMnfH6pZumg95Ag6Fkg2TLbXhYJfDxxd2YnaKNlq | Moti Nagar Latur | Latur  | Maharashtra | India   |  413512 | user  | female |
+|       2 | kapil      | lakamote    | kapil@gmail.com | 9090808070 | $2a$10$5CqHWZ.0lL6.1lSIXPAoTuIe/QkOmFNIIT0sdu2NNgxeFO4xNvuzC | At post Ekurga   | Omerga | Maharashtra | India   |  413604 | user  | NULL   |
+|       4 | anka       | lakamote    | anka@gmail.com  | NULL       | $2a$10$zXwaFd9CVJ8L243quban6uxtTBmYQ3nOCGhSt0irsyGggKDOjZ.dO | NULL             | NULL   | NULL        | NULL    |       0 | Admin | NULL   |
++---------+------------+-------------+-----------------+------------+--------------------------------------------------------------+------------------+--------+-------------+---------+---------+-------+--------+
+3 rows in set (0.00 sec)
+
+mysql> select * from theatre;
++------------+------+---------+---------+----------------+--------------+------+------+
+| theatre_id | name | city_id | user_id | address        | no_of_screen | key1 | key2 |
++------------+------+---------+---------+----------------+--------------+------+------+
+|          1 | PVR  |       1 |       1 | Karvenagar     |            1 | abc  | xyz  |
+|          2 | PVR  |       2 |       1 | Airoli         |            1 | abc  | xyz  |
+|          3 | PVR  |       3 |       1 | 5 no chowk     |            1 | abc  | xyz  |
+|          4 | PVR  |       4 |       1 | Shivaji chowk  |            1 | abc  | xyz  |
+|          5 | PVR  |       5 |       1 | Sambhaji chowk |            1 | abc  | xyz  |
+|          6 | PVR  |       1 |       4 | Karvenagar     |            4 | abc  | xyz  |
+|          7 | PVR  |       2 |       1 | Airoli         |            1 | abc  | xyz  |
+|          8 | PVR  |       3 |       1 | 5 no chowk     |            1 | abc  | xyz  |
+|          9 | PVR  |       4 |       1 | Shivaji chowk  |            1 | abc  | xyz  |
+|         10 | PVR  |       5 |       1 | Sambhaji chowk |            1 | abc  | xyz  |
++------------+------+---------+---------+----------------+--------------+------+------+
+10 rows in set (0.00 sec)
+
+mysql> select * from city;
++---------+-----------+-------------+--------------+
+| city_id | city_name | city_state  | city_pincode |
++---------+-----------+-------------+--------------+
+|       1 | Pune      | Maharashtra |       411001 |
+|       2 | Mumbai    | Maharashtra |       400001 |
+|       3 | Latur     | Maharashtra |       413512 |
+|       4 | Kolhapur  | Maharashtra |       416216 |
+|       5 | Sangli    | Maharashtra |       411211 |
++---------+-----------+-------------+--------------+
+5 rows in set (0.00 sec)
+
+mysql> SELECT
+    ->     theatre0_.theatre_id as theatre_1_10_0_,
+    ->     theatre0_.address as address2_10_0_,
+    ->     theatre0_.city_id as city_id7_10_0_,
+    ->     theatre0_.key1 as key3_10_0_,
+    ->     theatre0_.key2 as key4_10_0_,
+    ->     theatre0_.name as name5_10_0_,
+    ->     theatre0_.no_of_screen as no_of_sc6_10_0_,
+    ->     theatre0_.user_id as user_id8_10_0_,
+    ->     city1_.city_id as city_id1_0_1_,
+    ->     city1_.city_name as city_nam2_0_1_,
+    ->     city1_.city_pincode as city_pin3_0_1_,
+    ->     city1_.city_state as city_sta4_0_1_,
+    ->     user2_.user_id as user_id1_11_2_,
+    ->     user2_.address_line as address_2_11_2_,
+    ->     user2_.city as city3_11_2_,
+    ->     user2_.country as country4_11_2_,
+    ->     user2_.email as email5_11_2_,
+    ->     user2_.first_name as first_na6_11_2_,
+    ->     user2_.gender as gender7_11_2_,
+    ->     user2_.last_name as last_nam8_11_2_,
+    ->     user2_.password as password9_11_2_,
+    ->     user2_.phone_no as phone_n10_11_2_,
+    ->     user2_.pincode as pincode11_11_2_,
+    ->     user2_.role as role12_11_2_,
+    ->     user2_.state as state13_11_2_
+    -> FROM
+    ->     theatre theatre0_
+    ->     LEFT OUTER JOIN city city1_ ON theatre0_.city_id = city1_.city_id
+    ->     LEFT OUTER JOIN user user2_ ON theatre0_.user_id = user2_.user_id
+    -> WHERE
+    ->     theatre0_.theatre_id = ?;
